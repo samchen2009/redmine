@@ -1,0 +1,21 @@
+bundle install
+sudo apt-get install rmagickwand-dev
+gem install rmagick
+sudo apt-get install libpq-dev
+gem install pg -v 0.14.1
+sudo apt-get install libsqlite3
+gem install activerecord-mysql2-adapter
+rake db:create --trace
+rake generate_secret_token
+gem install mysql
+
+#change the mysql to mysql2 in database.yml
+
+cd /etc/init.d
+sudo wget https://raw.github.com/chloerei/nginx-init-ubuntu-passenger/master/nginx
+sudo update-rc.d nginx defaults
+sudo chmod +x nginx
+sudo service nginx start
+
+
+
