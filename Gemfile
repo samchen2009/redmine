@@ -5,8 +5,8 @@ gem "jquery-rails", "~> 2.0.2"
 gem "i18n", "~> 0.6.0"
 gem "coderay", "~> 1.0.6"
 gem "fastercsv", "~> 1.5.0", :platforms => [:mri_18, :mingw_18, :jruby]
-gem "builder", "3.0.0"
-
+gem "builder", ">=3.0.0"
+gem "debugger", ">=1.2.0"
 # Optional gem for LDAP authentication
 group :ldap do
   gem "net-ldap", "~> 0.3.1"
@@ -24,7 +24,7 @@ platforms :mri, :mingw do
     # RMagick 2 supports ruby 1.9
     # RMagick 1 would be fine for ruby 1.8 but Bundler does not support
     # different requirements for the same gem on different platforms
-    gem "rmagick", ">= 2.0.0"
+    #gem "rmagick", ">= 2.0.0"
   end
 end
 
@@ -47,16 +47,16 @@ end
 
 platforms :mri_19, :mingw_19 do
   group :mysql do
-    gem "mysql2", "~> 0.3.11"
+    #gem "mysql2", "~> 0.3.11"
   end
 end
 
 platforms :jruby do
   gem "jruby-openssl"
 
-  group :mysql do
-    gem "activerecord-jdbcmysql-adapter"
-  end
+  #group :mysql do
+  #  gem "activerecord-jdbcmysql-adapter"
+  #end
 
   group :postgresql do
     gem "activerecord-jdbcpostgresql-adapter"
