@@ -149,6 +149,7 @@ class ProjectsController < ApplicationController
       redirect_to_project_menu_item(@project, params[:jump]) && return
     end
 
+    debugger
     @users_by_role = @project.users_by_role
     @subprojects = @project.children.visible.all
     @news = @project.news.find(:all, :limit => 5, :include => [ :author, :project ], :order => "#{News.table_name}.created_on DESC")
