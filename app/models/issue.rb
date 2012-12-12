@@ -880,6 +880,7 @@ class Issue < ActiveRecord::Base
       end
 
       # TODO: Rename hook
+      debugger
       Redmine::Hook.call_hook(:controller_issues_edit_before_save, { :params => params, :issue => self, :time_entry => @time_entry, :journal => @current_journal})
       if save
         # TODO: Rename hook
