@@ -350,7 +350,6 @@ private
   # from the params
   # TODO: Refactor, not everything in here is needed by #edit
   def update_issue_from_params
-    debugger
     @edit_allowed = User.current.allowed_to?(:edit_issues, @project)
     @time_entry = TimeEntry.new(:issue => @issue, :project => @issue.project)
     @time_entry.attributes = params[:time_entry]
