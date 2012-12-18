@@ -25,7 +25,7 @@ class GroupsController < ApplicationController
   helper :custom_fields
 
   def index
-    @groups = Group.sorted.all
+    @groups = Group.all
 
     respond_to do |format|
       format.html
