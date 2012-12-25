@@ -82,36 +82,43 @@ function initPopupCard(popup,card,action,sender,receiver){
   }
 }
 
-function init_wip(json){
+function init_wip(kanban_id,json){
   var panes = json[0];
   var stages = json[1];
+  if (typeof(panes[0]) == "undefined") return;
+  //table = $("#kanban_" + panes[0].kanban_pane.kanban_id)
+  table = $("#kanban_" + kanban_id);
   for (i=0; i<stages.length; i++){
+    pane_id = panes[i].kanban_pane.id
     if (i > 0 && (stages[i].kanban_stage.id === stages[i-1].kanban_stage.id)){
-      wip += $("#pane_"+(i+1)).children(":visible").length;
+      wip += $("#pane_"+pane_id).children(":visible").length;
     }else{
-      wip = $("#pane_"+(i+1)).children(":visible").length;
+      wip = $("#pane_"+pane_id).children(":visible").length;
     }
     var wip_limit = panes[i].kanban_pane.wip_limit;
-    $("#wip_"+ stages[i].kanban_stage.id).text("(" + wip + ":" +wip_limit +")");
-    $("#wip_"+ stages[i].kanban_stage.id).data("wip",wip);
-    $("#wip_"+ stages[i].kanban_stage.id).data("wip_limit",wip_limit);
+    table.find("#wip_"+ stages[i].kanban_stage.id).text("(" + wip + ":" +wip_limit +")");
+    table.find("#wip_"+ stages[i].kanban_stage.id).data("wip",wip);
+    table.find("#wip_"+ stages[i].kanban_stage.id).data("wip_limit",wip_limit);
     //store stage name in each pane's data.
     $("#pane_"+(i+1)).data("stage",stages[i].kanban_stage.name);
+    $("#pane_"+(i+1)).data("stage_id",stages[i].kanban_stage.id);
   }
 }
 
 function updatePanesWip(sender, receiver){
-   var stage_from = sender.data("stage").id;
-   var stage_to   = receiver.data("stage").id;
+   var stage_from = sender.data("stage_id");
+   var stage_to   = receiver.data("stage_id");
+   var table = sender.parents("table");
+
    if (stage_from != stage_to){
-   	 var from_wip = $("#wip_"+stage_from).data("wip") - 1;
-   	 var to_wip  = $("#wip_"+stage_to).data("wip") + 1;
-   	 var from_wip_limit = $("#wip_"+stage_from).data("wip_limit");
-   	 var to_wip_limit = $("#wip_"+stage_from).data("wip_limit");
-   	 $("#wip_"+stage_from).text("(" + from_wip + ":" + from_wip_limit + ")");
-     $("#wip_"+stage_to).text("(" + to_wip + ":" + to_wip_limit + ")");
-     $("#wip_"+stage_from).data("wip",from_wip);
-     $("#wip_"+stage_to).data("wip",to_wip);
+   	 var from_wip = table.find("#wip_"+stage_from).data("wip") - 1;
+   	 var to_wip  = table.find("#wip_"+stage_to).data("wip") + 1;
+   	 var from_wip_limit = table.find("#wip_"+stage_from).data("wip_limit");
+   	 var to_wip_limit = table.find("#wip_"+stage_from).data("wip_limit");
+   	 table.find("#wip_"+stage_from).text("(" + from_wip + ":" + from_wip_limit + ")");
+     table.find("#wip_"+stage_to).text("(" + to_wip + ":" + to_wip_limit + ")");
+     table.find("#wip_"+stage_from).data("wip",from_wip);
+     table.find("#wip_"+stage_to).data("wip",to_wip);
      sender.data("wip",from_wip);
      receiver.data("wip",to_wip);
    }
@@ -194,7 +201,8 @@ function isValidKanbanTransition(from,to){
 function isValidIssueTransition(from,to){
 
 }
-/* Input: 
+
+/* Input:
  *   1. Card -> user/group -> roles.
  *   2. From Pane
  *   3. To Pane
@@ -207,24 +215,28 @@ function isValidIssueTransition(from,to){
 function cardIsAccepted(card,sender,receiver){
   var user_id   = card.find("#assignee_id").val();
   var status_id = card.find("#issue_status_id").val();
+  table = sender.parents("table");
 
   var to_state = receiver.attr("state_id");
   var from_state = sender.attr("state_id");
   var to_stage = kanbanStateToStage(to_state);
   var from_stage = kanbanStateToStage(from_state);
-  var to_wip = $("#wip_"+to_stage).data("wip");
-  var to_wip_limit = $("#wip_"+to_stage).data("wip_limit");
+  var to_wip = table.find("#wip_"+to_stage).data("wip");
+  var to_wip_limit = table.find("#wip_"+to_stage).data("wip_limit");
 
   var pane_role = receiver.attr("role_id");
 
-  if (to_stage === from_stage){
+  if (to_stage === from_stage && assignee_changed == false){
     return {"success":true,"error":"In the same stage"};
   }
-
-  /* Check user's WIP */
-  if (card.find("#assignee_id").val() != myUserID()){
+  /*
+   * 1. non-wip pane -> wip pane.
+   * 2. assignee changed in wip_pane.
+   */
+  if ((sender.attr("check_wip") == "false" && receiver.attr("check_wip") == "true") ||
+      (card.find("#assignee_id").val() != myUserID() && receiver.attr("check_wip") == "true")){
     my_wip_limit = $("#my-profile").data("user").user.wip_limit;
-    my_wip = $("#my-profile").data("wip");
+    my_wip = $("#my-profile").data("wip").length;
     if (my_wip == my_wip_limit){
       return {"success":false,"error":"reach your wip_limit"}
     }
