@@ -47,7 +47,7 @@ class WorkflowsController < ApplicationController
     if @tracker && @used_statuses_only && @tracker.issue_statuses.any?
       @statuses = @tracker.issue_statuses
     end
-    @statuses ||= IssueStatus.sorted.all
+    @statuses ||= IssueStatus.all
 
     if @tracker && @role && @statuses.any?
       workflows = WorkflowTransition.where(:role_id => @role.id, :tracker_id => @tracker.id).all

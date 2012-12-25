@@ -1,1 +1,13 @@
 Put your Redmine plugins here.
+
+/***********************************
+Procedures to create your plugins
+***********************************/
+
+1. generate plugin prototype.
+   e.g.  ruby script/rails generate redmine_plugin ekanban
+2. generate plugin model.
+   e.g.  ruby script/rails generate redmine_plugin_model ekanban UserStory name:string descriptions:string owner_id:integer verifier_id:integer issue_id:integer pane_id:integer created_at:datetime last_modified_at:datetime 
+3. generate plugin controller
+   e.g.  ruby script/rails generate redmine_plugin_controller ekanban panes index create
+

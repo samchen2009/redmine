@@ -1,0 +1,17 @@
+# English strings go here for Rails i18n
+en:
+  my_label: "My label"
+  label_kanban_new: "New Kanban"
+  label_kanban_setup: "Kanbans"
+  label_created_by: "Created by"
+  label_id: "No."
+  label_valid: "is_valid?"
+  label_kanban_panes: "Kanban Panes"
+  label_kanban_workflow: "Kanban Workflows"
+  label_kanban_general: "Kanban General"
+  label_kanban_pane_new: "New Kanban Pane"
+  label_wip_limit: "WIP limit"
+  label_kanban_state_new: "New Kanban State"
+  label_kanban_state_id: "Kanban State"
+  label_kanban_pane_edit: "Edit Kanban Pane"
+  label_position: "Position"

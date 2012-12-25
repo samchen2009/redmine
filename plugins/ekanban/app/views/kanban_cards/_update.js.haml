@@ -1,0 +1,7 @@
+- if @saved
+  $("#ajax-indicator").hide();
+  :plain
+    $("#popupWindow").dialog("close");
+- else
+  :plain
+    $("#popupWindow").find("#indication").css("color","red").css("float","right").text("error! #{errors}").show();

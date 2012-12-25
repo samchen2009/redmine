@@ -1,0 +1,149 @@
+.contextual
+  = link_to l(:label_kanban_new), new_project_kanban_path(), :class => 'icon icon-add'
+  = link_to l(:label_kanban_setup), "kanbans/setup", :class => 'icon icon-setup'
+%h2 Kanbans
+
+/ = javascript_include_tag 'kanban.js', :plugin => 'scrum2b' %>
+= stylesheet_link_tag 'kanban', :plugin => :ekanban
+= javascript_include_tag "http://code.jquery.com/jquery-1.8.2.js"
+= javascript_include_tag "http://code.jquery.com/ui/1.9.1/jquery-ui.js"
+= stylesheet_link_tag "http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css"
+= javascript_include_tag "http://code.jquery.com/ui/1.9.1/jquery-ui.js"
+= javascript_include_tag "http://www.formmail-maker.com/var/demo/jquery-popup-form/jquery.colorbox-min.js"
+= javascript_include_tag "select_list_move"
+= javascript_include_tag "kanban", :plugin => :ekanban
+= javascript_include_tag "kanban_api", :plugin => :ekanban
+
+#kanban_filter
+  = render :partial => "filter_board"
+
+/ = stylesheet_link_tag 'version', :plugin => 'kanbans'
+#kanban_boards
+  = render :partial => "kanban_board", :collection => @kanbans, :as => :kanban
+
+#popupWindow{:title => "Edit kanban card"}
+  #popupWindowBody
+    = render :partial => "kanban_card"
+  #popupWindowFoot
+
+/ Get rails variables from templates.
+= content_tag "div", "", :id => "kanban-data"
+= content_tag "div", "", :id => "my-profile", :data => {:user => @user, :roles => @roles}
+= content_tag "div", "", :id => "project-profile", :data => {:project => @project}
+
+:javascript
+  $(function() {
+
+    // Ignore case in contains()
+    $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+      return function( elem ) {
+        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+      };
+    });
+
+    // Make the pane sortable.
+    $( ".kanban-pane" ).sortable({
+      connectWith: ".kanban-pane",
+      start: function(event,ui){
+        ui.item.removeClass("acceptable");
+      },
+      receive: function(event,ui){
+        /* check */
+        result = cardIsAccepted(ui.item,ui.sender,$(this));
+        if (result.success){
+          ui.item.addClass("acceptable");
+        }else{
+          console.debug("rejected:" + result.error);
+          ui.item.removeClass("acceptable");
+        }
+        if (!ui.item.hasClass('acceptable')){
+          ui.sender.sortable("cancel");
+        }else{
+
+          if (!confirm("Are you sure? Click 'OK' will update the moving to server")){
+            ui.sender.sortable("cancel");
+          }else{
+            var popup = $("#popupWindow");
+            popupCard(ui.sender,$(this),ui.item,popup,"drop");
+            updatePanesWip(ui.sender,$(this));
+          }
+        }
+      },
+      remove: function(event,ui){
+        ui.item.removeClass("acceptable");
+      },
+    });
+
+    $(".kanan-card").draggable({
+      connectToSortable: '.kanban-pane',
+      revert: "invalid"
+    });
+
+    $( ".kanban-card" ).addClass( "ui-helper-clearfix ui-corner-all ")
+      .find( ".card-header" )
+        .addClass( "ui-widget-header ui-corner-all" )
+        .prepend( "<span class='ui-icon ui-icon-minusthick'></span>")
+        .end()
+      .find( ".card-content" );
+
+    $( ".card-header .ui-icon" ).click(function() {
+      $( this ).toggleClass( "ui-icon-minusthick" ).toggleClass( "ui-icon-plusthick" );
+      $( this ).parents( ".kanban-card:first" ).find( ".card-content" ).toggle();
+    });
+    $( ".kanban-pane" ).disableSelection();
+    $( ".search-input" ).enableSelection();
+
+    $( "#backlog-minus-icon").click(function(){
+      $(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+      $("#pane_1").find(".card-header .ui-icon").trigger("click");
+    });
+
+    $("#backlog-search-icon").click(function(){
+      $("#search-input").toggle();
+      if ($("#search-input").is("autofocus"))
+        $("#search-input").focus(0);
+      else
+        $("#search-input").focus(1);
+      $("#search-input").val("");
+      $("#search-input").trigger("keyup");
+    });
+
+    $("#search-input").keyup(function(){
+      var keywords = $(this).val()
+      if (keywords === "") {keywords="#"}
+      $("#pane_1").find(".kanban-card")
+        .hide()
+        .filter(":contains('"+(keywords)+"')")
+        .show();
+      text = $("#wip_backlog").text();
+      text = text.split(":");
+      text = "(" + $("#pane_1").children(".kanban-card:visible").length + ":" + text[1];
+      $("#wip_backlog").text(text);
+    }).keyup();
+
+    $( document ).tooltip();
+
+    $( document ).ready(function(){
+      $(".kanban-card").bind("dblclick", function(){
+        popupCard(null,null,$(this),$("#popupWindow"),"edit")
+      });
+
+      $("#popupSubmit").click(function(){
+        /* Ajax update card here */
+        updateCard();
+      });
+      $(".kanban-card a").css("color","blue");
+      //Ajax Call.
+      getKanbanStateIssueStatus();
+      getKanbanStates();
+      getKanbanWorkflow();
+      getUserWipAndLimit($("#my-profile").data("user").user.id);
+
+    });
+
+    $(".kanban-card:contains('P1')").addClass("p1-color")
+    $(".kanban-card:contains('P2')").addClass("p2-color")
+    $(".kanban-card:contains('P3')").addClass("p3-color")
+    $(".kanban-card:contains('P4')").addClass("p4-color")
+    $(".kanban-card:contains('P5')").addClass("p5-color")
+  });
