@@ -25,7 +25,6 @@ class WorkflowsController < ApplicationController
   end
 
   def edit
-    debugger
     @role = Role.find_by_id(params[:role_id]) if params[:role_id]
     @tracker = Tracker.find_by_id(params[:tracker_id]) if params[:tracker_id]
 
