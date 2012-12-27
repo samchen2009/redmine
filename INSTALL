@@ -1,3 +1,6 @@
+1. rvm_inst.sh 
+
+2. Install redmine
 bundle install
 sudo apt-get install rmagickwand-dev
 gem install rmagick
@@ -11,6 +14,7 @@ gem install mysql
 
 #change the mysql to mysql2 in database.yml
 
+3. Install nginx
 cd /etc/init.d
 sudo wget https://raw.github.com/chloerei/nginx-init-ubuntu-passenger/master/nginx
 sudo update-rc.d nginx defaults
