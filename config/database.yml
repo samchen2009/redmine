@@ -6,7 +6,7 @@ production:
   adapter: mysql2
   database: redmine
   host: localhost
-  username: root
+  username: redmine
   password: '123456'
   encoding: utf8
 
@@ -14,7 +14,7 @@ development:
   adapter: mysql2
   database: redmine_development
   host: localhost
-  username: root
+  username: redmine
   password: '123456'
   encoding: utf8
 
