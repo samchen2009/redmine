@@ -1,0 +1,9 @@
+.box
+  %h3= l(:label_avatar)
+  #avatar_image{:style=>"width: 128px; height: 128px; border: 1px silver solid;"}= avatar(@user, :size => "128")
+  %p
+  = form_tag( {:controller => "users", :action => 'save_avatar', :id=>@user}, :multipart => true) do
+    /=render :partial => 'attachments/form'
+    %p= file_field_tag "avatar", :id => nil, :class => 'file', :accept => 'image/png,image/gif,image/jpeg'
+    = submit_tag l(:button_save)
+    = submit_tag l(:button_delete), :confirm => l(:are_you_sure_delete_avatar)
