@@ -61,6 +61,7 @@ module Redmine
         end
 
         def save_attachments(attachments, author=User.current)
+          debugger
           if attachments.is_a?(Hash)
             attachments = attachments.values
           end
