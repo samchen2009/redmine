@@ -43,7 +43,6 @@ module LocalAvatarsPlugin
 
 			def save_avatar
 				@user = User.find(params[:id])
-
 				begin
 					save_or_delete # see the LocalAvatars module
 				rescue
