@@ -4,6 +4,17 @@
   %p
   = form_tag( {:action => 'save_avatar', :id=>@user.id}, :multipart => true) do
     /=render :partial => 'attachments/form'
-    %p= file_field_tag "avatar", :id => nil, :class => 'file', :accept => 'image/png,image/gif,image/jpeg'
+    %p= file_field_tag "avatar", :id => nil, :class => 'file', :accept => 'image/png,image/gif,image/jpeg', :onchange => "readURL(this);"
     = submit_tag l(:button_save)
     = submit_tag l(:button_delete), :confirm => l(:are_you_sure_delete_avatar)
+
+:javascript
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('avatar_image').getElementsByTagName('img')[0].src = e.target.result;
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
